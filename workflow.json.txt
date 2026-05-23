@@ -1,0 +1,362 @@
+{
+  "name": "DAY2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tallyform",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0d673b86-4ad3-45fe-8f21-e8e53046a41a",
+      "name": "Webhook",
+      "webhookId": "6c342b13-0748-4fc8-b644-bdd6752e387a"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\n\n// Get fields array\nconst fields = body.data.fields;\n\n// Helper function to find field value by label\nfunction getFieldValue(label) {\n  const field = fields.find(\n    f => f.label.toLowerCase() === label.toLowerCase()\n  );\n\n  return field ? field.value : \"\";\n}\n\n// Extract values\nconst name = getFieldValue(\"Name\");\nconst email = getFieldValue(\"Email\");\nconst company = getFieldValue(\"Company\");\nconst budget = getFieldValue(\"Budget\");\nconst message = getFieldValue(\"Message\");\n\n// Validation checks\nconst errors = [];\n\n// Name validation\nif (!String(name).trim()) {\n  errors.push(\"Name is required\");\n}\n\n// Company validation\nif (!String(company).trim()) {\n  errors.push(\"Company is required\");\n}\n\n// Email validation\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n\nif (!emailRegex.test(String(email))) {\n  errors.push(\"Invalid email format\");\n}\n\n// Budget validation\nconst budgetNumber = Number(budget);\n\nif (isNaN(budgetNumber)) {\n  errors.push(\"Budget must be a number\");\n} else if (budgetNumber <= 0) {\n  errors.push(\"Budget must be greater than 0\");\n}\n\n// Return final result\nreturn [\n  {\n    json: {\n      isValid: errors.length === 0,\n      errors,\n      timestamp: new Date().toISOString(),\n      name,\n      email,\n      company,\n      budget: budgetNumber,\n      message\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "666aae2e-1d13-4b2a-92e7-8f033c512940",
+      "name": "Validate Lead Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a6812c96-56ac-4b8a-8c52-8e30ca518e7d",
+              "leftValue": "={{ $json.isValid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "a5a188e1-88d8-49f0-86b8-be46d21ce368",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Lead submitted successfully\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "11ff03d2-2f93-4999-a409-7a14e5e740e7",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ \n{\n  \"success\": false,\n  \"errors\": $json.errors\n}\n}}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        624,
+        96
+      ],
+      "id": "17277ba3-659e-404a-afd5-e71038f30190",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qdsJISnjpqyF5l0hWfhg9o4U-O6zwZfkc_6PxKa-PSQ",
+          "mode": "list",
+          "cachedResultName": "DAY2 Lead Capture Validation System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qdsJISnjpqyF5l0hWfhg9o4U-O6zwZfkc_6PxKa-PSQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qdsJISnjpqyF5l0hWfhg9o4U-O6zwZfkc_6PxKa-PSQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $('Validate Lead Data').item.json.timestamp }}",
+            "Name": "={{ $('Validate Lead Data').item.json.name }}",
+            "Company": "={{ $('Validate Lead Data').item.json.company }}",
+            "Message": "={{ $('Validate Lead Data').item.json.message }}",
+            "Budget": "={{ $('Validate Lead Data').item.json.budget }}",
+            "Email": "={{ $('Validate Lead Data').item.json.email }}"
+          },
+          "matchingColumns": [
+            "Timestamp"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "3b0fae90-732a-4646-8000-f31069ec2f3e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "idNX1TNgWJWbBfH0",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "orah14days.app.n8n.cloud",
+            "user-agent": "Tally Webhooks",
+            "content-length": "1370",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "baggage": "sentry-environment=production,sentry-release=564febec9e06ec78d838a7fbaa2f42ec2d809a2d,sentry-public_key=6af4b6673f1648edaa8fef3f2ca43405,sentry-trace_id=ef3565aabfa8448b79cd6852a6e6e6c1,sentry-org_id=407628,sentry-sampled=false,sentry-sample_rand=0.7900503973567014,sentry-sample_rate=0",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "34.96.41.137",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "BE",
+            "cf-ray": "9fec041ced3ec4f0-LHR",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "sentry-trace": "ef3565aabfa8448b79cd6852a6e6e6c1-064e57a8c8dce630-0",
+            "x-forwarded-for": "34.96.41.137, 172.71.178.44",
+            "x-forwarded-host": "orah14days.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-19-57cc68dcc8-nzjpv",
+            "x-is-trusted": "yes",
+            "x-real-ip": "34.96.41.137"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "eventId": "d3c84d77-e8e0-44ca-9ea7-7381cf023a57",
+            "eventType": "FORM_RESPONSE",
+            "createdAt": "2026-05-20T14:26:22.808Z",
+            "data": {
+              "responseId": "X5DrbZP",
+              "submissionId": "X5DrbZP",
+              "respondentId": "kdJzd6o",
+              "formId": "QKz9jk",
+              "formName": "PROJECT DETAIL",
+              "createdAt": "2026-05-20T14:26:22.000Z",
+              "submissionPdfUrl": "https://api.tally.so/forms/QKz9jk/submissions/X5DrbZP/pdf?accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJtaXNzaW9uSWQiOiJYNURyYlpQIiwiZm9ybUlkIjoiUUt6OWprIiwiaWF0IjoxNzc5Mjg3MTgyfQ.YaQ34V_tRfkSDIiNJCIFjlLjaDZXcl2kMl3_BIoG0sE&signature=2b85981fffd93030e11777c2b7de357c8e1085addd8311b7fc6acb6f544c75c7",
+              "submissionPreviewUrl": "https://tally.so/forms/QKz9jk/submissions/X5DrbZP/preview?accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJtaXNzaW9uSWQiOiJYNURyYlpQIiwiZm9ybUlkIjoiUUt6OWprIiwiaWF0IjoxNzc5Mjg3MTgyfQ.YaQ34V_tRfkSDIiNJCIFjlLjaDZXcl2kMl3_BIoG0sE&signature=2b85981fffd93030e11777c2b7de357c8e1085addd8311b7fc6acb6f544c75c7",
+              "fields": [
+                {
+                  "key": "question_K0vdpK",
+                  "label": "Name",
+                  "type": "INPUT_TEXT",
+                  "value": ""
+                },
+                {
+                  "key": "question_L0vRD2",
+                  "label": "Email",
+                  "type": "INPUT_EMAIL",
+                  "value": "deborahdanjumbo@gmail.com"
+                },
+                {
+                  "key": "question_pVR8eE",
+                  "label": "Company",
+                  "type": "INPUT_TEXT",
+                  "value": "koka"
+                },
+                {
+                  "key": "question_1EDqWL",
+                  "label": "Budget",
+                  "type": "INPUT_NUMBER",
+                  "value": 20000
+                },
+                {
+                  "key": "question_M5vo10",
+                  "label": "Message",
+                  "type": "TEXTAREA",
+                  "value": "academic "
+                }
+              ]
+            }
+          },
+          "webhookUrl": "https://orah14days.app.n8n.cloud/webhook-test/tallyform",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Lead Data": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f700765d-2689-4a0e-929e-adbc95ea3fba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "018df315545d0279f2ae9a655223f446d14858dd2cf9b2bdc1c00358a959130d"
+  },
+  "id": "9AgI6OuZUspl0E9q",
+  "tags": []
+}
