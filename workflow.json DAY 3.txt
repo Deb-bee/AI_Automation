@@ -1,0 +1,544 @@
+{
+  "name": "DAY 3 Duplicate Detection Logic",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wQ5vjgatvS1v84EDeER3FYKuK_mHYr4OZqca8IsjXqs",
+          "mode": "list",
+          "cachedResultName": "DAY 3 Duplicate Detection Logic New leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wQ5vjgatvS1v84EDeER3FYKuK_mHYr4OZqca8IsjXqs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wQ5vjgatvS1v84EDeER3FYKuK_mHYr4OZqca8IsjXqs/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "466f45df-b3a9-4e2b-b944-1dbd4ef9edd3",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "idNX1TNgWJWbBfH0",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ===============================\n// 1. EXTRACT TALLY DATA (SAFE)\n// ===============================\nconst webhook = $('Webhook').first().json;\n\n// Tally fields extraction\nconst fields = webhook.body?.data?.fields || [];\n\nconst formData = {};\n\nfor (const field of fields) {\n    formData[field.label] = field.value;\n}\n\n// ===============================\n// 2. EXTRACT EMAIL (ROBUST)\n// ===============================\nlet incomingEmail = \"\";\n\n// Find email field safely (case-insensitive)\nfor (const field of fields) {\n    const label = (field.label || \"\").toLowerCase().trim();\n\n    if (label.includes(\"email\")) {\n        incomingEmail = (field.value || \"\").toLowerCase().trim();\n        break;\n    }\n}\n\n// Extra safety cleanup\nincomingEmail = (incomingEmail || \"\").toLowerCase().trim();\n\n// ===============================\n// 3. GOOGLE SHEETS DATA\n// ===============================\nconst existingLeads = items;\n\n// Normalize function\nconst normalize = (e) =>\n    (e || \"\")\n        .toString()\n        .toLowerCase()\n        .trim();\n\n// ===============================\n// 4. DUPLICATE CHECK (EMAIL ONLY - NO DATE YET)\n// ===============================\nlet isDuplicate = false;\nlet matchedRow = null;\n\nfor (const lead of existingLeads) {\n\n    // Try ALL possible column names (this is important)\n    const existingEmail = normalize(\n        lead.json.Email ||\n        lead.json.email ||\n        lead.json[\"Email Address\"] ||\n        lead.json[\"E-mail\"] ||\n        \"\"\n    );\n\n    console.log(\"Incoming:\", incomingEmail);\n    console.log(\"Existing:\", existingEmail);\n\n    if (existingEmail && incomingEmail && existingEmail === incomingEmail) {\n        isDuplicate = true;\n        matchedRow = lead.json;\n        break;\n    }\n}\n\n// ===============================\n// 5. RETURN OUTPUT\n// ===============================\nreturn [\n  {\n    json: {\n      name: formData.Name || \"\",\n      email: incomingEmail,\n      company: formData.Company || \"\",\n      budget: formData.Budget || \"\",\n      message: formData.Message || \"\",\n\n      isDuplicate,\n      matchedRow,\n\n      checkedAt: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "bc2e168c-8936-49d0-b5ec-6e01f5a9a85d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7952feeb-7842-40d5-8847-953bd8d83c01",
+              "leftValue": "={{ $json.isDuplicate }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "d4f238c2-1e63-4943-8ed5-ca938e7bcd2d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1wQ5vjgatvS1v84EDeER3FYKuK_mHYr4OZqca8IsjXqs",
+          "mode": "list",
+          "cachedResultName": "DAY 3 Duplicate Detection Logic New leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wQ5vjgatvS1v84EDeER3FYKuK_mHYr4OZqca8IsjXqs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 175322886,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wQ5vjgatvS1v84EDeER3FYKuK_mHYr4OZqca8IsjXqs/edit#gid=175322886"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Get row(s) in sheet').item.json.Name }}",
+            "Email": "={{ $('Get row(s) in sheet').item.json.Email }}",
+            "Company": "={{ $('Get row(s) in sheet').item.json.Company }}",
+            "Budget": "={{ $('Get row(s) in sheet').item.json.Budget }}",
+            "Submission Date": "={{ $('Code in JavaScript').item.json.originalSubmissionDate }}",
+            "Message": "={{ $('Get row(s) in sheet').item.json.Message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Submission Date",
+              "displayName": "Submission Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Note",
+              "displayName": "Note",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "c63d1c8d-7dba-4084-ab16-ac7affbdeeec",
+      "name": "DUPLICATE",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "idNX1TNgWJWbBfH0",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1wQ5vjgatvS1v84EDeER3FYKuK_mHYr4OZqca8IsjXqs",
+          "mode": "list",
+          "cachedResultName": "DAY 3 Duplicate Detection Logic New leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wQ5vjgatvS1v84EDeER3FYKuK_mHYr4OZqca8IsjXqs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wQ5vjgatvS1v84EDeER3FYKuK_mHYr4OZqca8IsjXqs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Code in JavaScript').item.json.name }}",
+            "Company": "={{ $('Code in JavaScript').item.json.company }}",
+            "Email": "={{ $('Code in JavaScript').item.json.email }}",
+            "Budget": "={{ $('Code in JavaScript').item.json.budget }}",
+            "Submission Date": "={{ $('Code in JavaScript').item.json.originalSubmissionDate }}",
+            "Message": "={{ $('Code in JavaScript').item.json.message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Submission Date",
+              "displayName": "Submission Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        96
+      ],
+      "id": "782a2b8b-c564-4e28-b96c-ba512c129a82",
+      "name": "NEW LEAD",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "idNX1TNgWJWbBfH0",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "deborahdanjumbo@gmail.com",
+        "subject": "New Lead Alert",
+        "message": "=A new lead has been submitted.  \n\nName: {{ $json.Name }} \nEmail:{{ $json.Email }}\nCompany:{{ $json.Company }}\nBudget:{{ $json.Budget }} \nMessage:{{ $json.Message }} \nPlease follow up within 24 hours.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "6d8b768d-a54e-42e5-82a2-742a0cbd1525",
+      "name": "Send a message",
+      "webhookId": "f1201468-ef7d-42cd-abcf-f244ff7b7dba",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZyGGL0KYMhcqySuU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "deborahdanjumbo@gmail.com",
+        "subject": "We’ve received your submission",
+        "message": "=Hello {{$json.name}},  We’ve already received your previous submission and our team is currently reviewing it.  Please note: We process all applications within a standard review cycle, and your request is already in progress.  There is no need to submit another application, as this does not speed up the process.  Our team will contact you once your review is complete.  Thank you for your patience.  Best regards,   Support Team.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "1cc7a06d-316e-4ed2-bbb6-eb3e28379236",
+      "name": "Send a message1",
+      "webhookId": "c4ae5ef0-030d-4062-b629-fa499a45f12d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZyGGL0KYMhcqySuU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tally",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "084a9e72-4262-4a63-a6cc-44bf54906242",
+      "name": "Webhook",
+      "webhookId": "56f59f31-3e6f-4a9d-a216-03f69cbc103d",
+      "retryOnFail": false
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "orah14days.app.n8n.cloud",
+            "user-agent": "Tally Webhooks",
+            "content-length": "1387",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "baggage": "sentry-environment=production,sentry-release=d22cc77fff603435f7746499c44aaf8930869ac7,sentry-public_key=6af4b6673f1648edaa8fef3f2ca43405,sentry-trace_id=89c55f6e8ce7e0188af3af1fc36cd78a,sentry-org_id=407628,sentry-sampled=false,sentry-sample_rand=0.9995168105215911,sentry-sample_rate=0",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "34.96.41.253",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "BE",
+            "cf-ray": "9ffd5099dd9860e2-LHR",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "sentry-trace": "89c55f6e8ce7e0188af3af1fc36cd78a-e821b6cbfaa98b31-0",
+            "x-forwarded-for": "34.96.41.253, 172.69.195.149",
+            "x-forwarded-host": "orah14days.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-19-57cc68dcc8-nzjpv",
+            "x-is-trusted": "yes",
+            "x-real-ip": "34.96.41.253"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "eventId": "991150cf-198f-443b-9c42-8dbdf942059d",
+            "eventType": "FORM_RESPONSE",
+            "createdAt": "2026-05-22T16:49:33.666Z",
+            "data": {
+              "responseId": "e569Rd0",
+              "submissionId": "e569Rd0",
+              "respondentId": "kdJzd6o",
+              "formId": "QKz9jk",
+              "formName": "PROJECT DETAIL",
+              "createdAt": "2026-05-22T16:49:33.000Z",
+              "submissionPdfUrl": "https://api.tally.so/forms/QKz9jk/submissions/e569Rd0/pdf?accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJtaXNzaW9uSWQiOiJlNTY5UmQwIiwiZm9ybUlkIjoiUUt6OWprIiwiaWF0IjoxNzc5NDY4NTczfQ.WjHxq-Y-5eagB2qITT5xA7t_klA5c4aeq7W0l_dw59o&signature=e3916259a00743b47f25db62efa931cec24a3260fa51c04075b59a13d21bb17f",
+              "submissionPreviewUrl": "https://tally.so/forms/QKz9jk/submissions/e569Rd0/preview?accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJtaXNzaW9uSWQiOiJlNTY5UmQwIiwiZm9ybUlkIjoiUUt6OWprIiwiaWF0IjoxNzc5NDY4NTczfQ.WjHxq-Y-5eagB2qITT5xA7t_klA5c4aeq7W0l_dw59o&signature=e3916259a00743b47f25db62efa931cec24a3260fa51c04075b59a13d21bb17f",
+              "fields": [
+                {
+                  "key": "question_K0vdpK",
+                  "label": "Name",
+                  "type": "INPUT_TEXT",
+                  "value": "Jonathan "
+                },
+                {
+                  "key": "question_L0vRD2",
+                  "label": "Email",
+                  "type": "INPUT_EMAIL",
+                  "value": "jonathanpepple@gmail.com"
+                },
+                {
+                  "key": "question_pVR8eE",
+                  "label": "Company",
+                  "type": "INPUT_TEXT",
+                  "value": "Gold"
+                },
+                {
+                  "key": "question_1EDqWL",
+                  "label": "Budget",
+                  "type": "INPUT_NUMBER",
+                  "value": 30000000
+                },
+                {
+                  "key": "question_M5vo10",
+                  "label": "Message",
+                  "type": "TEXTAREA",
+                  "value": "Trading company"
+                }
+              ]
+            }
+          },
+          "webhookUrl": "https://orah14days.app.n8n.cloud/webhook-test/tally",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "DUPLICATE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NEW LEAD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NEW LEAD": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DUPLICATE": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "819ee083-c7b7-45d3-9563-b7242eee7a33",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "018df315545d0279f2ae9a655223f446d14858dd2cf9b2bdc1c00358a959130d"
+  },
+  "id": "rhGtlez8PkDAw7qO",
+  "tags": []
+}
