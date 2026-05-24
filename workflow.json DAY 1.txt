@@ -1,0 +1,231 @@
+{
+  "name": "DAY 1: LEAD CAPTURE TEST copy",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "memory_build",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "33e3503b-828c-4d4a-8017-eda52602e357",
+      "name": "Webhook",
+      "webhookId": "89f2654d-0ed5-4f2b-b1dd-27b33d15bdd6"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the incoming data\nconst inputData = $input.first().json;\n\n// Find the email (keeping the working paths)\nconst email = \n  inputData.lead_details?.email ||\n  inputData.body?.lead_details?.email ||\n  inputData[0]?.lead_details?.email ||\n  '';\n\n// Preserve original data structure\nconst originalData = inputData.body || inputData || {};\n\n// Validate email\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nconst isValidEmail = emailRegex.test(email);\n\n// Return the data with isValidEmail added\nreturn {\n  ...originalData,\n  isValidEmail: isValidEmail\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4ceac9aa-2dc1-4efd-bb05-d2830fe8fe4b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5c18dd13-580a-402e-8557-e063a6e2724a",
+              "leftValue": "={{$json.isValidEmail}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "be9c4954-61b8-4f26-9718-68452624eb8e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "deborahdanjumbo@gmail.com",
+        "subject": "New Lead Alert!!!",
+        "message": "={{$json.message}} at {{$json.timestamp}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "99618755-1827-4691-b91f-9ee52d6d242c",
+      "name": "Send a message",
+      "webhookId": "b42f86b2-2699-404f-b90e-6190bf2b3cf9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3K1DBuDjNIIYJ7kL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"error\",\n  \"message\": \"Invalid email format\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        624,
+        96
+      ],
+      "id": "5e069036-8f17-490b-83a4-a780a0dbd335",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Lead received successfully\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "deeb0a80-e76e-49ac-be23-5c305fdca840",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "content-type": "application/json",
+            "user-agent": "PostmanRuntime/7.53.0",
+            "accept": "*/*",
+            "cache-control": "no-cache",
+            "postman-token": "fc5417f8-c30c-4e4d-8d20-5719e80468a2",
+            "host": "localhost:5678",
+            "accept-encoding": "gzip, deflate, br",
+            "connection": "keep-alive",
+            "content-length": "513"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "company_name": "Wear Orah",
+            "account_manager": "Deborah Dan-Jumbo",
+            "lead_details": {
+              "full_name": "Jane Smith",
+              "email": "janesmith@example.com",
+              "phone_number": "+2348012345678",
+              "interest": "Custom Fashion Design",
+              "source": "Instagram Ad"
+            },
+            "message": "A new lead has been captured and added to the spreadsheet. Please follow up within 24 hours.",
+            "spreadsheet_record": {
+              "lead_id": "LD1025",
+              "date_captured": "2026-05-19",
+              "status": "New"
+            }
+          },
+          "webhookUrl": "http://localhost:5678/webhook-test/memory_build",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a402e327-359f-42bb-8256-d1cd4da3eb89",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5ef808524d043c2f24ff51b90ca46dd210552a8a9b8b4320a3b66cc8a8c22104"
+  },
+  "id": "FvXcxsLR4XwhAXCK",
+  "tags": []
+}
