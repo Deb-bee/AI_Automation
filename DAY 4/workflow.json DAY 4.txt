@@ -1,0 +1,151 @@
+{
+  "name": "DAY 4 Multi‑Channel Notifications A",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6a59c941-0117-478c-ae9a-4a2a9b77e792",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "737d928f-d8a5-4a3a-b6ae-07df45c2ee4d",
+              "name": "Name",
+              "value": "John Doe",
+              "type": "string"
+            },
+            {
+              "id": "6c6fc6b0-bb3a-42c2-9353-982b08e23a53",
+              "name": "Company",
+              "value": "Acme Inc",
+              "type": "string"
+            },
+            {
+              "id": "dea6546c-028b-457d-8e27-70fb820b0ed4",
+              "name": "Email",
+              "value": "deborahdanjumbo@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "efe9cc33-8a24-4194-898f-0514fd4f9ea7",
+              "name": "Budget",
+              "value": 500000,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "15c51b4d-f7e1-47aa-b4c3-8a50fd091af3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0B5WLPB125",
+          "mode": "list",
+          "cachedResultName": "all-aiautomations"
+        },
+        "text": "={{ $json.Name }} New lead: \nfrom {{ $json.Company }}, \nBudget: {{ $json.Budget }}.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        496,
+        -96
+      ],
+      "id": "a977e268-b5be-4497-bdd1-bc01383f724a",
+      "name": "Send a message",
+      "webhookId": "2a7b59a9-e40e-4b67-859c-4d85676073b7",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "fKbUvOtJOcJBRLtg",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Thanks for reaching out",
+        "message": "=Hi {{ $json.Name }},  Thanks for reaching out to us.  We received your request and will respond within 24 hours.  Best regards, Your Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        128
+      ],
+      "id": "994aa19f-70ce-4cab-8574-1487f988c4f4",
+      "name": "Send a message1",
+      "webhookId": "f0f7f94d-8bf1-4f87-bc4d-83a254697042",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZyGGL0KYMhcqySuU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f9b3b62d-05f4-4b5a-abdd-c550f22433e2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "018df315545d0279f2ae9a655223f446d14858dd2cf9b2bdc1c00358a959130d"
+  },
+  "id": "6vCzVpuF5R2kGNb2",
+  "tags": []
+}

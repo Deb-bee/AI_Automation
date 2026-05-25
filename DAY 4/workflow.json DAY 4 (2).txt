@@ -1,0 +1,189 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        128
+      ],
+      "id": "fd4fe381-957e-4703-b5dd-4cb576a60059",
+      "name": "Webhook",
+      "webhookId": "29b94afc-f464-4676-a8c5-04f5a6a363bc"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0B5WLPB125",
+          "mode": "list",
+          "cachedResultName": "all-aiautomations"
+        },
+        "text": "=New lead: {{$json.body.data.fields.find(f => f.label === \"Name\")?.value}} \nfrom {{$json.body.data.fields.find(f => f.label === \"Company\")?.value}},\nEmail: {{$json.body.data.fields.find(f => f.label === \"Email\")?.value}}, \nBudget: {{$json.body.data.fields.find(f => f.label === \"Budget\")?.value}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "45f99e1e-89b3-48d9-ba9e-5e171c496a1e",
+      "name": "Send a message",
+      "webhookId": "a428351e-57d0-44f1-9ffb-93f781dc917e",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "fKbUvOtJOcJBRLtg",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "deborahdanjumbo@gmail.com",
+        "subject": "Thanks for reaching out",
+        "message": "=Hi {{$json.name}},  Thanks for reaching out to us.  We received your request and will respond within 24 hours.  Best regards, Your Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        208
+      ],
+      "id": "3892af76-0e79-4629-b550-b24937f6b27c",
+      "name": "Send a message1",
+      "webhookId": "0e23c7fa-2c0c-4d61-be28-527ad6b9a586",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZyGGL0KYMhcqySuU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "orah14days.app.n8n.cloud",
+            "user-agent": "Tally Webhooks",
+            "content-length": "1386",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "baggage": "sentry-environment=production,sentry-release=d22cc77fff603435f7746499c44aaf8930869ac7,sentry-public_key=6af4b6673f1648edaa8fef3f2ca43405,sentry-trace_id=2e450c4d329dd739eab4fbec7967f942,sentry-org_id=407628,sentry-sampled=false,sentry-sample_rand=0.23760160012214737,sentry-sample_rate=0",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "34.96.62.147",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "BE",
+            "cf-ray": "a00bb8387ed59418-LHR",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "sentry-trace": "2e450c4d329dd739eab4fbec7967f942-1a1618a9ddc6f32a-0",
+            "x-forwarded-for": "34.96.62.147, 172.70.162.41",
+            "x-forwarded-host": "orah14days.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-19-57cc68dcc8-zpb7c",
+            "x-is-trusted": "yes",
+            "x-real-ip": "34.96.62.147"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "eventId": "a4411fda-c438-4d12-aacc-62a1b08785f2",
+            "eventType": "FORM_RESPONSE",
+            "createdAt": "2026-05-24T10:46:58.579Z",
+            "data": {
+              "responseId": "aO6yZZv",
+              "submissionId": "aO6yZZv",
+              "respondentId": "kdJzd6o",
+              "formId": "QKz9jk",
+              "formName": "PROJECT DETAIL",
+              "createdAt": "2026-05-24T10:46:58.000Z",
+              "submissionPdfUrl": "https://api.tally.so/forms/QKz9jk/submissions/aO6yZZv/pdf?accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJtaXNzaW9uSWQiOiJhTzZ5Wlp2IiwiZm9ybUlkIjoiUUt6OWprIiwiaWF0IjoxNzc5NjE5NjE4fQ.Tmj_QbKWeH8rpHKYl-LDvazrCeYJHBYU-9qETVzRisg&signature=0480bdc7435649ef358ea6480bb7a2cceac6398c86ee209f5dd0df26fef1c85f",
+              "submissionPreviewUrl": "https://tally.so/forms/QKz9jk/submissions/aO6yZZv/preview?accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJtaXNzaW9uSWQiOiJhTzZ5Wlp2IiwiZm9ybUlkIjoiUUt6OWprIiwiaWF0IjoxNzc5NjE5NjE4fQ.Tmj_QbKWeH8rpHKYl-LDvazrCeYJHBYU-9qETVzRisg&signature=0480bdc7435649ef358ea6480bb7a2cceac6398c86ee209f5dd0df26fef1c85f",
+              "fields": [
+                {
+                  "key": "question_K0vdpK",
+                  "label": "Name",
+                  "type": "INPUT_TEXT",
+                  "value": "Dan - Jumbo"
+                },
+                {
+                  "key": "question_L0vRD2",
+                  "label": "Email",
+                  "type": "INPUT_EMAIL",
+                  "value": "deborahdanjumbo@gmail.com"
+                },
+                {
+                  "key": "question_pVR8eE",
+                  "label": "Company",
+                  "type": "INPUT_TEXT",
+                  "value": "Wear Orah"
+                },
+                {
+                  "key": "question_1EDqWL",
+                  "label": "Budget",
+                  "type": "INPUT_NUMBER",
+                  "value": 3000000
+                },
+                {
+                  "key": "question_M5vo10",
+                  "label": "Message",
+                  "type": "TEXTAREA",
+                  "value": "Fashion"
+                }
+              ]
+            }
+          },
+          "webhookUrl": "https://orah14days.app.n8n.cloud/webhook-test/lead",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "bc5cca31-b011-4746-8326-d4bfd03222bd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "018df315545d0279f2ae9a655223f446d14858dd2cf9b2bdc1c00358a959130d"
+  },
+  "id": "4NdEtaCUpxg9hgXh",
+  "tags": []
+}
