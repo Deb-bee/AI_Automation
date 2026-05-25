@@ -1,0 +1,253 @@
+{
+  "name": "Lead System",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tally",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        -16
+      ],
+      "id": "7d5f0ece-5fc1-4bfc-a456-fc39263fb125",
+      "name": "Webhook",
+      "webhookId": "0f6b3790-5b12-4920-877e-811aa5eb8029"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0B5WLPB125",
+          "mode": "list",
+          "cachedResultName": "all-aiautomations"
+        },
+        "text": "=New Lead 🚀 \nName: {{ $json.name }} \nCompany: {{ $json.company }}\nEmail: {{ $json.email }} \nBudget: {{ $json.budget }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        720,
+        -80
+      ],
+      "id": "e1e0a0ec-f4e5-4356-9417-3ea2e55a9c73",
+      "name": "Send a message",
+      "webhookId": "f1111279-22f2-4130-ac56-588eaa8c1306",
+      "retryOnFail": true,
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "fKbUvOtJOcJBRLtg",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "throw new Error(\"Testing Error Logger\");"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -16
+      ],
+      "id": "7c7f0fb0-5ea1-44b4-8e46-28c6149df8b5",
+      "name": "Code in JavaScript",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Thanks for your message",
+        "message": "=Hi {{$json.name}},  Thanks for reaching out. We will respond within 24 hours.  Regards, Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        704,
+        160
+      ],
+      "id": "3d60af02-074d-4153-ab2c-ceeca8ba2c6d",
+      "name": "Send a message1",
+      "webhookId": "e69181b4-0c45-4b91-b49e-6ddbdc57134b",
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZyGGL0KYMhcqySuU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const fields = $json.body.data.fields;\n\nfunction get(label) {\n  return fields.find(f => f.label === label)?.value;\n}\n\nreturn [\n  {\n    json: {\n      name: get(\"Name\"),\n      email: get(\"Email\"),\n      company: get(\"Company\"),\n      budget: get(\"Budget\")\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "0b58bcec-3f04-4516-8b36-7660ab42b63c",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "content": "thhis code node wa deactivated because it was used to test for errors, it can be entirely removed to test real data\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        144
+      ],
+      "typeVersion": 1,
+      "id": "26fa4325-7855-4ae8-9ce8-a9cfedb6281b",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "orah14days.app.n8n.cloud",
+            "user-agent": "Tally Webhooks",
+            "content-length": "1379",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "baggage": "sentry-environment=production,sentry-release=d22cc77fff603435f7746499c44aaf8930869ac7,sentry-public_key=6af4b6673f1648edaa8fef3f2ca43405,sentry-trace_id=50c5004b15620d86198edab86ae956cc,sentry-org_id=407628,sentry-sampled=false,sentry-sample_rand=0.27704014887365036,sentry-sample_rate=0",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "34.96.41.57",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "BE",
+            "cf-ray": "a014e297fc751669-LHR",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "sentry-trace": "50c5004b15620d86198edab86ae956cc-3856aa6dbdb7f815-0",
+            "x-forwarded-for": "34.96.41.57, 172.69.224.169",
+            "x-forwarded-host": "orah14days.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-19-57cc68dcc8-c899r",
+            "x-is-trusted": "yes",
+            "x-real-ip": "34.96.41.57"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "eventId": "87efbbcd-890e-42fc-8420-f371519fa059",
+            "eventType": "FORM_RESPONSE",
+            "createdAt": "2026-05-25T13:28:46.025Z",
+            "data": {
+              "responseId": "M1bZ5QE",
+              "submissionId": "M1bZ5QE",
+              "respondentId": "kdJzd6o",
+              "formId": "QKz9jk",
+              "formName": "PROJECT DETAIL",
+              "createdAt": "2026-05-25T13:28:45.000Z",
+              "submissionPdfUrl": "https://api.tally.so/forms/QKz9jk/submissions/M1bZ5QE/pdf?accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJtaXNzaW9uSWQiOiJNMWJaNVFFIiwiZm9ybUlkIjoiUUt6OWprIiwiaWF0IjoxNzc5NzE1NzI2fQ.VV4S9Ct52W1WVV-0bNrnB3kdAqLK6n7z30auU0t4V8A&signature=badfdb985089a91ddd88dcfa904a75bf3d259d8327a114a6ac301805895ab216",
+              "submissionPreviewUrl": "https://tally.so/forms/QKz9jk/submissions/M1bZ5QE/preview?accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJtaXNzaW9uSWQiOiJNMWJaNVFFIiwiZm9ybUlkIjoiUUt6OWprIiwiaWF0IjoxNzc5NzE1NzI2fQ.VV4S9Ct52W1WVV-0bNrnB3kdAqLK6n7z30auU0t4V8A&signature=badfdb985089a91ddd88dcfa904a75bf3d259d8327a114a6ac301805895ab216",
+              "fields": [
+                {
+                  "key": "question_K0vdpK",
+                  "label": "Name",
+                  "type": "INPUT_TEXT",
+                  "value": "Mary"
+                },
+                {
+                  "key": "question_L0vRD2",
+                  "label": "Email",
+                  "type": "INPUT_EMAIL",
+                  "value": "maryjohnson@gmail.com"
+                },
+                {
+                  "key": "question_pVR8eE",
+                  "label": "Company",
+                  "type": "INPUT_TEXT",
+                  "value": "medi store"
+                },
+                {
+                  "key": "question_1EDqWL",
+                  "label": "Budget",
+                  "type": "INPUT_NUMBER",
+                  "value": 30000000
+                },
+                {
+                  "key": "question_M5vo10",
+                  "label": "Message",
+                  "type": "TEXTAREA",
+                  "value": "Pharmacy "
+                }
+              ]
+            }
+          },
+          "webhookUrl": "https://orah14days.app.n8n.cloud/webhook-test/tally",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "becf2c15-3a9f-4569-b4ab-141f7d9db813",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "018df315545d0279f2ae9a655223f446d14858dd2cf9b2bdc1c00358a959130d"
+  },
+  "id": "cNuZHljekxJceKyv",
+  "tags": []
+}

@@ -1,0 +1,167 @@
+{
+  "name": "DAY 5 RETRY FLOW",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "077984e1-8bed-48f2-abec-b0423e0a637a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  return {\n    json: {\n      name: item.json.workflow_name,   // fallback only\n      email: \"not available\",\n      company: \"not available\",\n      budget: \"not available\"\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "4f471104-96b7-4569-891b-576dd70c14a6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0B5WLPB125",
+          "mode": "list",
+          "cachedResultName": "all-aiautomations"
+        },
+        "text": "=Retry Lead 🚀  Name: {{$json.name}} Company: {{$json.company}} Email: {{$json.email}} Budget: {{$json.budget}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        688,
+        -80
+      ],
+      "id": "c4b0874c-8d1f-4ba9-be93-73fab0935996",
+      "name": "Send a message",
+      "webhookId": "5d7c82ce-88b9-4f4b-aed9-727966865875",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "fKbUvOtJOcJBRLtg",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "deborahdanjumbo@gmail.com",
+        "subject": "ALERT !!!",
+        "message": "=Hi {{$json.name}}, we are following up on your request.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        144
+      ],
+      "id": "a2d91674-8d60-48c2-b40b-10c0710f9204",
+      "name": "Send a message1",
+      "webhookId": "579b3ac8-a7a6-446e-bade-5db2f36915c3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZyGGL0KYMhcqySuU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1txnNfrgnovgNPiQPVWZSaas8oAAvBv1LSfuhWDTWfNQ",
+          "mode": "list",
+          "cachedResultName": "DAY 5 ERRORS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1txnNfrgnovgNPiQPVWZSaas8oAAvBv1LSfuhWDTWfNQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1txnNfrgnovgNPiQPVWZSaas8oAAvBv1LSfuhWDTWfNQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "385a7bee-e03a-4e95-ad5b-b3729ae146bc",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "idNX1TNgWJWbBfH0",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "59b0d4fb-a62d-4f1f-96bf-779728911c13",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "018df315545d0279f2ae9a655223f446d14858dd2cf9b2bdc1c00358a959130d"
+  },
+  "id": "nrSXM8kydMOWnUpk",
+  "tags": []
+}
